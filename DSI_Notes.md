@@ -1,4 +1,21 @@
 
+# Vim
+`i` to insert  
+<kbd>esc</kbd> to exit insert mode  
+`:q` to quit  
+`:wq` to write and quit (save and quit)  
+
+[Vim Quick Reference](https://github.com/GalvanizeDataScience/course-outline/blob/20-10-DS-DEN_DEN19/quick-reference/Vim.pdf)
+
+# VSCode
+[VSCode Quick Reference - Linux](https://github.com/GalvanizeDataScience/course-outline/blob/20-10-DS-DEN_DEN19/quick-reference/VSCode_Linux.pdf)
+
+# Regular Expressions (Regex)
+[Build and Test Regex](https://regexr.com/)  
+[Regex Guide with Examples](https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285)
+
+![Regex Basics](images/regex_1.png)
+
 # Command Line
 
 [DSI Lecture "Just enough command line"](https://github.com/GalvanizeDataScience/lectures/blob/Denver/unix/chris-reger/Unix.pdf)  
@@ -920,5 +937,106 @@ array([[-1.37638192],
        [-2.22703273]])
 ```
 # Pandas
+
+[Pandas Quick Reference](https://github.com/GalvanizeDataScience/course-outline/blob/20-10-DS-DEN_DEN19/quick-reference/Pandas.pdf)
+[Offical Pandas User Guide](https://pandas.pydata.org/pandas-docs/dev/user_guide/index.html#user-guide)  
+[Pandas Examples](http://manishamde.github.io/blog/2013/03/07/pandas-and-python-top-10/)  
+
+## Working with Data in Pandas - Workflow
+
+## 1: Explore the Data
+```python
+df = pd.read_csv('data/winequality-red.csv', delimiter=';')
+df = pd.read_csv('my_data.csv', header=None) # if no header name
+df = pd.read_csv('my_data.csv', header=None, names=['col1', 'col2', 'col3']) # add missing column names
+df.head() # shows you the first rows, defaults to 5
+df.tail() # shows you the last rows
+df.shape  # give you the number of rows and number of cols
+df.columns # gives you back a list of all the column names
+df.info()  # allows you to look at the data type for each column and the number of null values.
+df.describe() # gives you summary stats for all of your numeric columns
+df.unique()
+df['column name'].unique() # gives unique values in that column
+```
+## 2. Cleaning the Data and Dealing with Missing Data (Null, NaN, None)
+Make sure you can justify how you are dealing with missing data. Is there a better option than eliminating the rows and columns with missing data?
+```python
+df2 = df.copy() # best practice to make a copy of the original data
+cols = df2.columns.tolist()   # creates a list of the column names
+cols = [col.replace('#', 'num') for col in cols] # this replaces the pound sign with num
+cols = [col.replace(' ', '_'.lower())] # replace spaces with underscores and make everything lowercase
+df2.columns = cols  # reassigning the new columns to the dataframe
+
+# how to rename a column with pandas
+df.rename(columns={'original column name' : 'new_column_name'}, inplace = True)
+
+# how to deal with missing values
+df.fillna(-1, inplace= True)  # this will fill all NA/NULL values with the value -1
+df.dropna(inplace = True)    # this will just drop all column/spaces that have a NULL value
+
+# creating and dropping columns
+df['non_free_sulfer'] = df['total sulfur dioxide'] - df['free sulfur dioxide'] # add a new column titled non_free_sulfer
+
+df.drop('non_free_sulfur2', axis =1. inplace = True) # Drop the non_free_sulfur2 column. Axis = 1 is referring to axis 1 which is columns
+
+# Cast the date column as datetime object / how to add date and time with pandas
+df['incident_date'] = pd.to_datetime(df['incident_date'])
+```
+## Indexing
+```python
+df['column name'] # grabs the column titled 'column name'
+df[['column1' , 'column2']]   # how to access multiple columns 
+df[:3] # this will grab from the beginning up to but not including the row at index 3
+df[:1] # this will grab up to but not including 
+```
+
+**.loc and .iloc**  
+`.loc` is looking for lables or location  
+`.iloc` is looking for indicies  
+`.iloc` is non-inclusive  
+`.loc` is inclusive  
+
+## Groupby and Sort
+**Grouping**  
+When grouping you need to assign the group to a value or else it wil return the memory location.
+When you group, the column you group by becomes the index. It will return all columns based on the groupby'd column.
+```python
+    groupby_obj = df.groupby('column_name')
+    groupby_obj.mean()
+    groupby_obj.max()
+    groupby_obj.count()
+
+    # if you want to get a group by and a specific column:
+    df.groupby('column_name').count()['column_name2']
+
+    # how to group by multiple columns
+    df.groupby(['column1', 'column2']).count()['column3']
+
+    # how to group by an equation
+    df_new = df.groupby('column1').agg({'column2': 'sum', 'column3' : 'mean'}).reset_index()
+```
+**Sorting**
+```python
+df.sort_values('column_name') # default here is ascending
+df.sort_values('column_name', ascending = False)
+
+# a more specific sort
+df['column_name'].sort_values(ascending = False) 
+
+# you can sort by multiple columns by placing them in a list
+# it will sort the first column passed first, then the second
+df.sort_values(['column_1', 'column2'], ascending =[True, False]).reset_index(drop = True)
+ ```   
+## Masking
+```python
+df['column_name'] <= 0.08 # this just gives us a mask, tells us True or False whether each row fits the condition
+
+df[df['column_name'] <= 0.08 ] # proper way to use a mask 
+df[(df['column_name'] >= 0.04) & (df['column_name'] < 0.08)] # a more complicated mask
+```
+## Combining Datasets - .join, .merge, .concat
+[DSI Jupyter Notebook on Combining Datasets](https://github.com/GalvanizeDataScience/lectures/blob/Denver/pandas/rosie-martinez/additional_resources/pandas_combining_data_notes.ipynb)  
+
+## Pandas Graphing, Plotting, and Visualization
 
 # Matplotlib
