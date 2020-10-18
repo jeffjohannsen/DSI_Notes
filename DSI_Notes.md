@@ -938,11 +938,14 @@ array([[-1.37638192],
 ```
 # Pandas
 
-[Pandas Quick Reference](https://github.com/GalvanizeDataScience/course-outline/blob/20-10-DS-DEN_DEN19/quick-reference/Pandas.pdf)
-[Offical Pandas User Guide](https://pandas.pydata.org/pandas-docs/dev/user_guide/index.html#user-guide)  
+[**Official Pandas User Guide - Exceptional Docs**](https://pandas.pydata.org/pandas-docs/dev/user_guide/index.html#user-guide)   
+[Pandas Quick Reference](https://github.com/GalvanizeDataScience/course-outline/blob/20-10-DS-DEN_DEN19/quick-reference/Pandas.pdf)   
 [Pandas Examples](http://manishamde.github.io/blog/2013/03/07/pandas-and-python-top-10/)  
 
 ## Working with Data in Pandas - Workflow
+
+[Data Wrangling Jupyter Notebook](https://nbviewer.jupyter.org/github/cs109/content/blob/master/lec_04_wrangling.ipynb)  
+[Reshaping Data - Pandas Official Docs](https://pandas.pydata.org/pandas-docs/stable/user_guide/reshaping.html)
 
 ## 1: Explore the Data
 ```python
@@ -989,31 +992,35 @@ df[['column1' , 'column2']]   # how to access multiple columns
 df[:3] # this will grab from the beginning up to but not including the row at index 3
 df[:1] # this will grab up to but not including 
 ```
+**.loc and .iloc** 
 
-**.loc and .iloc**  
-`.loc` is looking for lables or location  
-`.iloc` is looking for indicies  
+[iloc and loc explanation and examples](https://www.shanelynn.ie/select-pandas-dataframe-rows-and-columns-using-iloc-loc-and-ix/)  
+
+`.loc` is looking for labels or location  
+`.iloc` is looking for indices  
 `.iloc` is non-inclusive  
-`.loc` is inclusive  
+`.loc` is inclusive
+
+![iloc and loc summary](images/pandas_iloc_loc.png)
 
 ## Groupby and Sort
 **Grouping**  
 When grouping you need to assign the group to a value or else it wil return the memory location.
 When you group, the column you group by becomes the index. It will return all columns based on the groupby'd column.
 ```python
-    groupby_obj = df.groupby('column_name')
-    groupby_obj.mean()
-    groupby_obj.max()
-    groupby_obj.count()
+groupby_obj = df.groupby('column_name')
+groupby_obj.mean()
+groupby_obj.max()
+groupby_obj.count()
 
-    # if you want to get a group by and a specific column:
-    df.groupby('column_name').count()['column_name2']
+# if you want to get a group by and a specific column:
+df.groupby('column_name').count()['column_name2']
 
-    # how to group by multiple columns
-    df.groupby(['column1', 'column2']).count()['column3']
+# how to group by multiple columns
+df.groupby(['column1', 'column2']).count()['column3']
 
-    # how to group by an equation
-    df_new = df.groupby('column1').agg({'column2': 'sum', 'column3' : 'mean'}).reset_index()
+# how to group by an equation
+df_new = df.groupby('column1').agg({'column2': 'sum', 'column3' : 'mean'}).reset_index()
 ```
 **Sorting**
 ```python
@@ -1039,4 +1046,350 @@ df[(df['column_name'] >= 0.04) & (df['column_name'] < 0.08)] # a more complicate
 
 ## Pandas Graphing, Plotting, and Visualization
 
+Pandas has some basic visualization options for quick EDA.  
+[In Depth on Pandas Visualizations](https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html)  
+```python
+df['quality'].plot(kind='hist')
+df.hist(figsize = (10,10));
+df.plot(kind='scatter', x='free_sulfur_dioxide', y='total_sulfur_dioxide')
+df.plot(kind='box')
+pd.plotting.scatter_matrix(df) 
+```
 # Matplotlib
+
+[**DSI Lecture - Appendix is Especially Useful**](https://github.com/GalvanizeDataScience/lectures/blob/Denver/matplotlib/chris-reger/matplotlib_intro.ipynb)  
+[Quick Reference - Matplotlib](https://github.com/GalvanizeDataScience/course-outline/blob/20-10-DS-DEN_DEN19/quick-reference/Matplotlib.pdf)  
+[Examples and Explanations of More Complex Graphs](http://www.randalolson.com/2014/06/28/how-to-make-beautiful-data-visualizations-in-python-with-matplotlib/)  
+
+![Visual of Graph Structure](images/matplotlib_overview.png)
+
+```python
+import matplotlib.pyplot as plt  #standards should be followed
+
+# Set a style. the base style sucks. I also like fivethirtyeight'
+plt.style.use('ggplot')
+# Increasing master fontsize and setting a font type. Use bigger font for presentations.
+matplotlib.rcParams.update({'font.size': 16, 'font.family': 'sans'})
+```
+## **Setting Up** 
+```python
+# number and organization of subplots, size of overall figure
+fig, axs = plt.subplots(2, 3, figsize=(10, 5))
+
+Iterating through the subplots.
+for i, ax in enumerate(axs.flatten()): # extremely useful pattern
+    
+    # Adding the Actual Graphs/Plots - Examples
+    # Line Graph
+    ax.plot(x, x+13, color="purple", lw=1, ls='-', marker='o', markersize=2)
+    # Scatter Plot
+    ax.scatter(xx, xx + 0.25*np.random.randn(len(xx)))
+    # Step Graph
+    ax.step(n, n**2, lw=2)
+    # Bar Chart
+    ax.bar(n, n**2, align="center", width=0.5, alpha=0.5)
+    # Fill_Between Graph
+    ax.fill_between(x, x**2, x**3, color="green", alpha=0.5)
+
+    # Every Graph
+    ax.set_title("This is a Great Plot!") # ax.set_title(f"Plot: {i}")
+    ax.set_xlabel("This is an x-label")
+    ax.set_ylabel("This is a y-label!")
+    # Only Sometimes
+    ax.text(0.35, 0.4, "Hi Y'all!", fontsize=35) # text on the graph
+    ax.set_xticks(x)
+    ax.set_xticklabels(record_counts['genre'])
+    ax.legend(loc=0) # add labels to each plot you add to the axe. loc determines where the legend goes
+```
+![Graph Type Examples - from above code](images/matplotlib_chart_types.png)
+
+## **Line Styling on Line Graphs**
+```python
+fig, ax = plt.subplots(figsize=(12,6))
+
+ax.plot(x, x+1, color="blue", linewidth=0.25)
+ax.plot(x, x+2, color="blue", linewidth=0.50)
+ax.plot(x, x+3, color="blue", linewidth=1.00)
+ax.plot(x, x+4, color="blue", linewidth=2.00)
+
+# possible linestype options ‘-‘, ‘--’, ‘-.’, ‘:’, ‘steps’
+ax.plot(x, x+5, color="red", lw=2, linestyle='-')
+ax.plot(x, x+6, color="red", lw=2, ls='-.')
+ax.plot(x, x+7, color="red", lw=2, ls=':')
+
+# possible marker symbols: marker = '+', 'o', '*', 's', ',', '.', '1', '2', '3', '4', ...
+ax.plot(x, x+ 9, color="green", lw=2, ls='--', marker='+')
+ax.plot(x, x+10, color="green", lw=2, ls='--', marker='o')
+ax.plot(x, x+11, color="green", lw=2, ls='--', marker='s')
+ax.plot(x, x+12, color="green", lw=2, ls='--', marker='1')
+
+# marker size and color
+ax.plot(x, x+13, color="purple", lw=1, ls='-', marker='o', markersize=2)
+ax.plot(x, x+14, color="purple", lw=1, ls='-', marker='o', markersize=4)
+ax.plot(x, x+15, color="purple", lw=1, ls='-', marker='o', markersize=8, markerfacecolor="red")
+ax.plot(x, x+16, color="purple", lw=1, ls='-', marker='s', markersize=8, 
+        markerfacecolor="yellow", markeredgewidth=2, markeredgecolor="blue")
+```
+![Line Styling - from above code](images/matplotlib_line_styling.png)  
+```python
+fig.tight_layout() # helps avoid overlapping graphs
+```
+## **Saving Graphs**
+```python
+# To save a figure to a file we can use the savefig method in the Figure class:
+fig.savefig("filename.png")
+# Here we can also optionally specify the DPI and choose between different output formats:
+fig.savefig("filename.png", dpi=200)
+```
+# Data Visualization
+
+## One Dimensional Scatterplot
+```python
+def one_dim_scatterplot(data, ax, jitter=0.2, **options):
+    ## why jitter? especially for bootstraping
+    if jitter:
+        jitter = np.random.uniform(-jitter, jitter, size=data.shape)
+    else:
+        jitter = np.repeat(0.0, len(data))
+    ax.scatter(data, jitter, **options)
+    ax.yaxis.set_ticklabels([])
+    ax.set_ylim([-1, 1])
+    ax.tick_params(axis='both', which='major', labelsize=15)
+
+fig, ax = plt.subplots(1, figsize=(12, 1))
+one_dim_scatterplot(data, ax, s=15)
+```
+![One Dimension Scatterplot](images/one_dimension_scatter_plot.png)  
+
+
+
+# STATS and PROBABILITY
+
+[Seeing Theory - Visualize Concepts](https://seeing-theory.brown.edu/basic-probability/index.html)  
+
+# Probability Distributions
+
+[DSI Lecture - Probability Distributions](https://github.com/GalvanizeDataScience/lectures/blob/Denver/probability-distributions/fred-berendse/probability-distributions.pdf)  
+
+A **random variable**, usually written X, is a variable whose possible values are
+numerical outcomes of a random phenomenon.
+The pattern of probabilities of a random variable is called its **distribution**.
+
+
+**Cumulative Distribution Function (CDF)** - the probability that a random variable X has a value <=x
+![CDF](images/cdf.png) 
+
+**Probability Mass Function (PMF)** - the probability of a particular value occurring (discrete)
+![PMF](images/pmf.png)  
+
+**Probability Density Function (PDF)** - same as PMF, but for continuous variables
+    * Density function doesn’t tell us the probability that our random variable will assume any specific value, but does tell us the probability that the output of the random variable will fall into a specific range
+
+## Discrete Probability Distributions
+
+**Uniform Distribution - Discrete**  
+Describes a situation with a finite number of outcomes, where each outcome is as equally likely as any other.
+![Uniform Distribution](images/uniform_distribution.png)  
+**Bernouli Distribution**  
+ The simplest discrete distribution. It is a model of a single flip of a (possibly unfair) coin.  
+![Bernouli Distribution](images/bernoulli_pmf.png)  
+**Binomial Distribution**  
+A counting distribution. It models flipping a (possibly unfair) coin some number of times, and counting how many times the coin lands heads.
+![Binomial Distribution](images/binomial_pmf.png)  
+**Hypergeometric Distribution**  
+Another counting distribution. This one models a deck of cards of two types (say red cards and blue cards). If you shuffle the deck, draw some number of cards, and then count how many blue cards you have, this count is hyper geometrically distributed.  
+![Hypergeometric Distribution 1](images/hypergeometric_pmf_1.png)
+![Hypergeometric Distribution 2](images/hypergeometric_pmf_2.png)  
+**Poisson Distribution**  
+Another counting distribution. The Poisson
+distribution models a process where events happen at a fixed rate or frequency,
+and you're watching it for a fixed amount of time.
+
+This distribution is applicable only if the events are independent and identically
+distributed.
+* Independent - knowledge of event A tells you nothing about the probability of
+event B
+* Identically distributed - the probability of event A has the same distribution
+as that of event B  
+
+![Poisson Distribution](images/poisson_pmf.png)
+
+## Continuous Probability Distributions
+
+**Uniform distribution - Continuous**  
+There is also a continuous version of the Uniform Distribution. It also describes a
+set of outcomes that are all equally likely, but this time any number in an interval is
+a possible output of the random variable. For example, the position a raindrop falls
+on a line segment (in a very large rainstorm) is uniformly distributed.  
+
+![Uniform Distribution - Continous](images/uniform_continuous.png)  
+
+**Normal Distribution (Gaussian)**  
+
+![Normal Distribution 1](images/normal_dist_1.png)  
+![Normal Distribution 2](images/normal_dist_2.png) 
+
+**Exponential Distribution**  
+A continuous distribution related to the Poisson
+distribution.
+* Poisson: How many events will you observe in a given time?
+* Exponential: How much time will it take to observe the first event?  
+
+![Exponential Distribution](images/exponential_dist.png)  
+
+## **Coding Distributions in Scipy**
+
+**Creating a Distribution Object**
+```python
+import scipy.stats as stats
+
+# Discrete Distributions
+uniform_disc = stats.randint(low=0, high=10) # k = 0, 1, ..., 9
+bernoulli = stats.bernoulli(p=0.4)
+binomial = stats.binom(n=50, p=0.4)
+hypergeom = stats.hypergeom(M=20, n=7, N=12) # non-standard parameters!
+poisson = stats.poisson(mu=5) # mu is the same as lambda
+
+# Continuous Distributions
+uniform_cont = stats.uniform(loc=0, scale=10) # non-standard parameters!
+normal = stats.norm(loc=0.0, scale=1.0) # non-standard parameters!
+exponental = stats.expon(loc=2.0) # non-standard parameters!
+```
+**Finding CDF**  
+```python
+print("P(Binomial(n=50, p=0.4) <= 20) = ", binomial.cdf(20))
+print("P(Normal(mu=0.0, sigma=1.0) <= 1.0 = ", normal.cdf(1.0))
+P(Binomial(n=50, p=0.4) <= 20) =  0.5610349320400658
+P(Normal(mu=0.0, sigma=1.0) <= 1.0 =  0.8413447460685429
+```  
+
+**Finding PMF**
+```python
+print("P(Binom(n=50, p=0.4) == 20) = ", binomial.pmf(20))
+print("P(Poisson(lambda=5) == 7) = ", poisson.pmf(7))
+P(Binom(n=50, p=0.4) == 20) =  0.11455855282952349
+P(Poisson(lambda=5) == 7) =  0.10444486295705395
+```
+
+**Sampling Random Numbers**  
+The rvs (Random ValueS) method samples from a distribution object.
+```python
+print("Ten random draws from a Binomial(n=50, p=0.4): ", binomial.rvs(10))
+print("Ten random draws from a Normal(mu=0.0, sigma=1.0): ", normal.rvs(10))
+Ten random draws from a Binomial(n=50, p=0.4):  [16 17 20 22 19 25 19 20 16 17]
+Ten random draws from a Normal(mu=0.0, sigma=1.0):  [ 1.7594658   1.46029478 -0.06747751 -1.39694945 -0.20049015 -0.05654447 0.29456879  1.26254489  2.30070426  0.51292104]
+```
+# Sampling Distributions and Bootstraping
+
+“The population is the object that interests us, and the sample is the lens through which we get to view it”
+* All college students in colorado would be a population, a sample of that might be students randomly selected from the University of Boulder
+* Many times there are restrictions around how many samples can be taken from a population (time, money, etc.), so Bootstraping is used to generate random samples from a sample taken.
+* A bootstrap sample from a dataset is a sample taken with replacement from that dataset whose size is the size of the dataset itself.
+* Whats the point of bootstraping? - The Bootstrap is a tool to quantify the variation in a statistical estimate. It can be used in almost any situation.
+
+
+Main Question:
+How do we quantify the amount of variation of a sample statistic?
+
+Ideal Answer:
+1. Draw a number of i.i.d. points from the population
+2. Compute the statistic
+3. Record the statistic in a database
+4. Repeat, repeat, repeat until the sun burns out
+5. Determine the variation in your database
+
+# Central Limit Theorem
+
+States that the distribution of sample means taken from a population >30 will always be normal.
+This only holds true for the mean, no other sample statistics.
+The CLT allows us to make probabilistic statements about the sample mean from any population using the normal distribution.
+
+
+# Maximum Likelihood Estimation
+
+# Binomial Tests
+
+[StatQuest Video - Binomial Distribution and Test](https://www.youtube.com/watch?v=J8jNoF-K8E8)  
+
+**Binomial Test** - A specific type of hypothesis test involving random variables
+that can be modeled by the binomial distribution (i.e. they fall into two
+categories)  
+**Probability** - We know the parameters of a distribution and we would like to study properties of data generated from that distribution  
+**Statistics** - Have data generated from a random variable, and we would like to infer properties of its distribution   
+**P-value** - "The probability of observing data at least as extreme as the observation given the null hypothesis"
+* If the p-value is smaller than your stated threshold (generally 0.05), must assume that the skeptic’s hypothesis (H-null) is NOT true.  
+
+**Hypothesis Testing**  
+1. State a scientific question - its answer should be yes or no
+2. State a null hypothesis - the skeptic’s answer to the question
+3. State an alternative hypothesis - the non-skeptic’s answer to the question
+4. Create a model - the model assumes the null hypothesis is true
+5. Set a threshold - decide how surprised you need to be to reject the null
+hypothesis
+6. Collect your data
+7. Calculate a p-value - the probability of finding a result equally or more
+extreme if the null hypothesis is true
+8. Compare the p-value to your stated rejection threshold
+
+## Coding a Binomial Test
+**Create the Null Hypothesis**  
+**Determine Significance Level (Alpha)**
+
+\# of kickflips landed | Null Hypothesis ~ Binomial(n = 100, p = 0.8)  
+alpha= 0.20  &nbsp;&nbsp;-a typical alpha is 0.05
+```python
+binomial = stats.binom(100, 0.8)
+
+fig, ax = plt.subplots(1, figsize=(16, 4))
+bars = ax.bar(range(101), [binomial.pmf(i) for i in range(101)], align="center", color="grey")
+ax.set_xlim(0, 101)
+ax.set_title("# of Kickflips Landed Under The Null Hypothesis")
+```
+![Binomial Test 1](images/binomial_test_1.png)
+
+**Collect the Data**  
+
+Matt landed 84 of 100 kickflips.
+
+**Calculate the Probability of Finding a Result Equally or More Extreme than Actually Observed Assuming the Probabilistic Model You Created. (The Null Hypothesis)**
+```python
+fig, ax = plt.subplots(1, figsize=(16, 4))
+bars = ax.bar(range(101), [binomial.pmf(i) for i in range(101)], color="grey", align="center")
+ax.set_xlim(0, 101)
+
+for i in range(84, 101):
+    bars[i].set_color('red')
+    
+ax.set_title("P-value Region")
+```
+![Binomial Test 2](images/binomial_test_2.png)  
+```python
+prob_equal_or_more_extreme = 1 - binomial.cdf(83)
+print("Probability of Observing Data More Equal or More Extreme than Actual: {:2.2}".format(
+    prob_equal_or_more_extreme))
+```
+Probability of Observing Data More Equal or More Extreme than Actual: 0.19  
+Compare the P-Value to Your Stated Rejection Threshold of 0.20.
+
+
+
+
+
+# Hypothesis Testing
+**Hypothesis Testing**  
+1. State a scientific question - its answer should be yes or no
+2. State a null hypothesis - the skeptic’s answer to the question
+3. State an alternative hypothesis - the non-skeptic’s answer to the question
+4. Create a model - the model assumes the null hypothesis is true
+5. Set a threshold - decide how surprised you need to be to reject the null
+hypothesis
+6. Collect your data
+7. Calculate a p-value - the probability of finding a result equally or more
+extreme if the null hypothesis is true
+8. Compare the p-value to your stated rejection threshold
+
+# Statistical Power
+
+# Bayesian Statistics
+
+# Bayesian Hypothesis Testing
