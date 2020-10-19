@@ -1100,6 +1100,9 @@ for i, ax in enumerate(axs.flatten()): # extremely useful pattern
     ax.set_xticks(x)
     ax.set_xticklabels(record_counts['genre'])
     ax.legend(loc=0) # add labels to each plot you add to the axe. loc determines where the legend goes
+    ax.axvline(x_axis_location, color='red', linestyle='--', linewidth=1) # create a vertical line
+    ax.fill_between(x_values, y_values_1, 0, where=(x_values > 25), color="red", alpha=0.2, label='middle 95%')
+
 ```
 ![Graph Type Examples - from above code](images/matplotlib_chart_types.png)
 
@@ -1143,6 +1146,95 @@ fig.savefig("filename.png", dpi=200)
 ```
 # Data Visualization
 
+[Choosing a Good Chart](https://extremepresentation.typepad.com/blog/files/choosing_a_good_chart.pdf)
+
+## **What Makes a Good Graph**  
+
+* Keep it simple and clean
+* What is the point you are trying to get across?
+* Make it readable
+* Make sure your font sizes on your axes, ticks, titles, and legends are legible
+* Use the correct graph for your data
+* Colors and symbols matter just as much in a good visualization as the data you are using
+* Remember your audience
+* Your graph might make sense to another data scientist, but what about a CFO, your
+grandmother, or someone who doesn’t know the first thing about data?
+* A graph is only a graph until you provide context - storytelling, see below
+
+## **The 8 Commandments of Data Storytelling**  
+
+1. Begin with a question: Set up your story. What is your audience going to learn?
+2. End with an insight: If we can’t learn something useful from the data, the story isn’t worth telling.
+3. Tell a compelling story: People remember stories, not data. Take them on your journey.
+4. Explain with visuals, Narrate with words: People understand metrics, trends, and patterns better with
+visuals. Use words to add your voice to the data.
+5. Be honest and credible: The clients we want value honesty. Don’t sugarcoat the negatives. And don’t
+mislead with fractioned data.
+6. Be clear and concise: Remove everything that is not part of your story. Save the other bits for another
+time.
+7. Know and cater to your audience: What are their interests and goals? Do they want the details, or just
+the high-level summary?
+8. Provide context: Compare metrics over time or to industry benchmarks. Numbers are meaningless
+without context.
+
+## **Types of Data**  
+
+**Qualitative**: Descriptive information  
+**Quantitative**: Numerical Information  
+**Discrete**: Data can only take on certain values (int)  
+**Continuous**: Data can take any value (float)  
+**Nominal**: Non-numeric categories (brand)  
+**Ordinal**: Numeric data with non-constant or unknown spacing (t-shirt sizes)  
+**Interval**: Numeric data with uniform spacing (date)  
+**Ratio**: Interval data with a natural zero  
+
+![Graphing Order of Importance based on Data Type](images/data_visualization.png)
+
+## **Types of Plots and when to use them:**  
+
+**Scatter**:  
+Data Types: Continuous, Quantitative  
+Comparing an X variable to a Y variable  
+Used to observe relationships between variables  
+
+**Line Plots**:  
+Data Types: Continuous, Quantitative, Interval, Ordinal  
+Constructed of lines connecting points called “markers”  
+X-axis is ordinal or interval in nature, like a time series  
+
+**Histograms**:  
+Data Types: Continuous, Quantitative  
+Creates “bins” to separate the data, convention says that each ‘bin’ is left inclusive, right exclusive  
+Can show the overall distribution of the data  
+Right Skewed - tail goes to the right (left is opposite)  
+To calculate the proper number of bins: `#_bins = sqrt(n_samples)`  
+
+**Kernel Density Plot**  
+Can show the overall distribution of the data on a continuous interval allowing for smoother distributions by smoothing the noise  
+
+**Bar Chart**:  
+Data Types: All  
+Used to represent the same variable over a number of domains  
+Can show frequency distributions for discrete variables  
+Should be sorted in order if x-labels are not ordinal  
+
+**Box Plot**:  
+Data Types: Continuous, Quantitative  
+Used to visually represent the five number summary  
+Can show the distribution's skew  
+Can visually represent outliers  
+
+**Violin Plot**  
+Similar to box plot, but adds in the kernel density plot in each side (shows the distribution shape)  
+Shows the summary statistics in the plot as well  
+
+**Pie Chart**  
+Useless  
+
+**Heat Maps**  
+Visually represent a matrix  
+Typically used to show covariance and correlation  
+
 ## One Dimensional Scatterplot
 ```python
 def one_dim_scatterplot(data, ax, jitter=0.2, **options):
@@ -1159,9 +1251,19 @@ def one_dim_scatterplot(data, ax, jitter=0.2, **options):
 fig, ax = plt.subplots(1, figsize=(12, 1))
 one_dim_scatterplot(data, ax, s=15)
 ```
-![One Dimension Scatterplot](images/one_dimension_scatter_plot.png)  
+![One Dimension Scatterplot](images/one_dimension_scatter_plot.png) 
 
+## Empirical Distribution Plot
 
+```python
+def empirical_distribution(x, data):
+    '''Cumulative distribution for the data'''
+    weight = 1.0 / len(data)
+    count = np.zeros(shape=len(x))
+    for datum in data:
+        count = count + np.array(x >= datum)
+    return weight * count
+```
 
 # STATS and PROBABILITY
 
@@ -1175,11 +1277,12 @@ A **random variable**, usually written X, is a variable whose possible values ar
 numerical outcomes of a random phenomenon.
 The pattern of probabilities of a random variable is called its **distribution**.
 
-
 **Cumulative Distribution Function (CDF)** - the probability that a random variable X has a value <=x
+
 ![CDF](images/cdf.png) 
 
 **Probability Mass Function (PMF)** - the probability of a particular value occurring (discrete)
+
 ![PMF](images/pmf.png)  
 
 **Probability Density Function (PDF)** - same as PMF, but for continuous variables
@@ -1189,17 +1292,25 @@ The pattern of probabilities of a random variable is called its **distribution**
 
 **Uniform Distribution - Discrete**  
 Describes a situation with a finite number of outcomes, where each outcome is as equally likely as any other.
-![Uniform Distribution](images/uniform_distribution.png)  
+
+![Uniform Distribution](images/uniform_distribution.png) 
+
 **Bernouli Distribution**  
  The simplest discrete distribution. It is a model of a single flip of a (possibly unfair) coin.  
+
 ![Bernouli Distribution](images/bernoulli_pmf.png)  
+
 **Binomial Distribution**  
 A counting distribution. It models flipping a (possibly unfair) coin some number of times, and counting how many times the coin lands heads.
+
 ![Binomial Distribution](images/binomial_pmf.png)  
+
 **Hypergeometric Distribution**  
 Another counting distribution. This one models a deck of cards of two types (say red cards and blue cards). If you shuffle the deck, draw some number of cards, and then count how many blue cards you have, this count is hyper geometrically distributed.  
+
 ![Hypergeometric Distribution 1](images/hypergeometric_pmf_1.png)
-![Hypergeometric Distribution 2](images/hypergeometric_pmf_2.png)  
+![Hypergeometric Distribution 2](images/hypergeometric_pmf_2.png) 
+
 **Poisson Distribution**  
 Another counting distribution. The Poisson
 distribution models a process where events happen at a fixed rate or frequency,
@@ -1284,28 +1395,84 @@ Ten random draws from a Normal(mu=0.0, sigma=1.0):  [ 1.7594658   1.46029478 -0.
 “The population is the object that interests us, and the sample is the lens through which we get to view it”
 * All college students in colorado would be a population, a sample of that might be students randomly selected from the University of Boulder
 * Many times there are restrictions around how many samples can be taken from a population (time, money, etc.), so Bootstraping is used to generate random samples from a sample taken.
-* A bootstrap sample from a dataset is a sample taken with replacement from that dataset whose size is the size of the dataset itself.
+* A bootstrap sample from a dataset is a sample taken **with replacement** from that dataset whose size is the size of the dataset itself.
 * Whats the point of bootstraping? - The Bootstrap is a tool to quantify the variation in a statistical estimate. It can be used in almost any situation.
 
+```python
+def bootstrap_sample_medians(data, n_bootstrap_samples=10000): # data is the original sample
+    bootstrap_sample_medians = []
+    for i in range(n_bootstrap_samples):
+        # creating one bootstrap sample
+        bootstrap_sample = np.random.choice(data, size=len(data), replace=True) 
+        # taking the staistic(median) form the sample and adding it to a list
+        bootstrap_sample_medians.append(np.median(bootstrap_sample))  
+    # returning the list of all the bootstrap sample medians (a distribution)
+    return bootstrap_sample_medians
+``` 
 
-Main Question:
-How do we quantify the amount of variation of a sample statistic?
-
-Ideal Answer:
-1. Draw a number of i.i.d. points from the population
-2. Compute the statistic
-3. Record the statistic in a database
-4. Repeat, repeat, repeat until the sun burns out
-5. Determine the variation in your database
+The distribution of the statistics (median) from the bootstrap samples can be used to determine confidence intervals for the population median.  
+```python
+left_endpoint = np.percentile(bootstrap_sample_medians, 2.5)
+right_endpoint = np.percentile(bootstrap_sample_medians, 97.5)
+population_median_confidence_interval = [left_endpoint, right_endpoint]
+```
 
 # Central Limit Theorem
 
 States that the distribution of sample means taken from a population >30 will always be normal.
 This only holds true for the mean, no other sample statistics.
-The CLT allows us to make probabilistic statements about the sample mean from any population using the normal distribution.
+The Central Limit Theorem allows us to make probabilistic statements about the sample mean from any population using the normal distribution.  
 
+![CLT_1](images/central_limit_theorem_1.png)
 
+![CLT_2](images/central_limit_theorem_2.png)
+
+![CLT_3](images/central_limit_theorem_3.png)
+
+## Compute Confidence Interval Function
+```python
+def compute_confidence_interval(data, confidence_width):
+    sample_mean = np.mean(data)
+    sample_varaince = np.var(data)
+    distribution_of_sample_minus_population_mean = stats.norm(0, np.sqrt(sample_varaince / len(data)))
+    alpha = distribution_of_sample_minus_population_mean.ppf(0.5 - (confidence_width / 2.0))
+    # Alpha is negative
+    return sample_mean + alpha, sample_mean - alpha
+```
 # Maximum Likelihood Estimation
+
+The goal is to find the distribution(type and parameters) that best fits the data you have.
+
+## Calculating the Log Likelihood given the data, the distribution type, and the distribution parameters.
+```python
+import numpy as np
+import scipy.stats as stats
+import scipy.optimize as optim
+
+def log_likelihood_normal_one_parameter(mu):
+    normal = stats.norm(mu, 1,0)
+    likelihoods = [normal.pdf(datum) for datum in data]
+    return np.sum(np.log(likelihoods))
+
+def log_likelihood_normal_two_parameters(mu, sigma_sq):
+    normal = stats.norm(mu, np.sqrt(sigma_sq))
+    likelihoods = [normal.pdf(datum) for datum in data]
+    return np.sum(np.log(likelihoods))
+```
+
+## Using Scipy Optimize to determine the parameters that maximize the Log-Likelihood (best fit the data)
+```python
+# optim does gradient descent, not gradient ascent
+def minus_log_likelihood_normal_two_parameters(mu, sigma):
+    return -log_likelihood_normal_two_parameters(mu, sigma)
+
+# The optimizer needs a function that consumes a single numpy array
+def wrapper_for_scipy(x):
+    return minus_log_likelihood_normal_two_parameters(x[0], x[1])
+
+fit_parms = optim.minimize(wrapper_for_scipy, (0, 1), method='Nelder-Mead')
+mu_hat, sigma_sq_hat = fit_parms.x
+```
 
 # Binomial Tests
 
@@ -1371,12 +1538,14 @@ print("Probability of Observing Data More Equal or More Extreme than Actual: {:2
 Probability of Observing Data More Equal or More Extreme than Actual: 0.19  
 Compare the P-Value to Your Stated Rejection Threshold of 0.20.
 
-
-
-
-
 # Hypothesis Testing
-**Hypothesis Testing**  
+
+[**Great Explanation of Hypothesis Testing with Examples - Just Open This!**](https://towardsdatascience.com/hypothesis-testing-in-machine-learning-using-python-a0dc89e169ce)  
+
+[Types of Hypothesis Tests and When to Use Them](https://github.com/GalvanizeDataScience/lectures/blob/Denver/hypothesis-testing/kayla-thomas/resources/hypo_formulas.pdf)  
+
+## Hypothesis Testing Workflow   
+
 1. State a scientific question - its answer should be yes or no
 2. State a null hypothesis - the skeptic’s answer to the question
 3. State an alternative hypothesis - the non-skeptic’s answer to the question
@@ -1388,8 +1557,163 @@ hypothesis
 extreme if the null hypothesis is true
 8. Compare the p-value to your stated rejection threshold
 
+![Null and Alternative Hypothesis](images/null_vs_alternative_hypothesis.png)
+
+**One tailed test** :- A test of a statistical hypothesis , where the region of rejection is on only one side of the sampling distribution , is called a one-tailed test.
+* Example :- a college has ≥ 4000 student or data science ≤ 80% org adopted.  
+
+**Two-tailed test** :- A two-tailed test is a statistical test in which the critical area of a distribution is two-sided and tests whether a sample is greater than or less than a certain range of values. If the sample being tested falls into either of the critical areas, the alternative hypothesis is accepted instead of the null hypothesis.
+* Example : a college != 4000 student or data science != 80% org adopted
+
 # Statistical Power
 
-# Bayesian Statistics
+[How Power, Alpha, Effect Size, and Sample Size Interact - Visualization](https://rpsychologist.com/d3/nhst/)  
 
-# Bayesian Hypothesis Testing
+## What is Power
+
+* The “power” of our hypothesis test to detect an effect if there actually is one.
+* Given that the true distribution is H1, the probability our test rejects the (false) null hypothesis.
+* False Positive = Type 1 Error = Rejected the Null Hypothesis when shouldn't have
+* False Negative = Type 2 Error = Failed to Reject the Null Hypothesis when should have rejected it
+* As each of alpha, n, and effect size increase, so does power (all directly related).
+
+![Power and Type 1,2 Errors](images/statistical_power.png)
+
+## Sample Code for Determining Power and Sample Size
+```python
+from scipy import stats
+from math import ceil
+
+def z_power(alpha, n, mu_a, mu_b, s):
+    '''Calculates the power of a one-tailed Z-test.
+        Args:
+            alpha: Allowable Type I error rate.
+            n: Sample size.
+            mu_a: The mean value of a
+            mu_b: The mean value of b
+            s: The standard deviation of a
+        Returns:
+            power: the power of the z-test
+    '''
+    stderr = s / n**.5
+    score = (mu_b - mu_a)/stderr - stats.norm.ppf(1-alpha)
+    return stats.norm.cdf(score)
+
+def z_solve_for_n(power, alpha, mu_a, mu_b, s):
+    '''Solves for the number of samples needed
+        to achieve a particular power on a one-tailed Z-test.
+        Args:
+            power: The desired power.
+            alpha: Allowable Type I error rate.
+            mu_a: The mean value of a
+            mu_b: The mean value of b
+            s: The standard deviation of a (note: We make a simplying assumption that)
+        Returns:
+            n: The required sample size.
+    '''
+    return ((stats.norm.ppf(power) - stats.norm.ppf(alpha)) * s / (mu_b - mu_a) )**2
+
+if __name__ == "__main__":
+    # Breakout 2 starting code
+    alpha = 0.20 # tolerated Type I error rate (incorrectly rejecting H0)
+    beta = 0.05   # tolerated Type II error rate (failing to reject H0 when we should)
+    power = 1 - beta
+
+    mu_a = 0.06  # the mean value of a
+    mu_b = 0.07  # the mean value of b
+    s = 0.24    # the standard deviation of a
+    
+    required_n = z_solve_for_n(power, alpha, mu_a, mu_b, s)
+    print(required_n)
+```
+
+
+# Bayesian Statistics and Hypothesis Testing
+
+**Prior Probability** - A PMF / PDF representing your intital beliefs about the parameter(s)  
+**Likelihood** - The probability of observing the data given the parameter(s)  
+**Posterior Probability** - The product of prior and likelihood (bayesian-update)
+* the posterior probability becomes the prior of the next update    
+
+**Normalizing Constant** - the probability of observing the data.  
+
+**Bayes Rule: P(A|B) = P(B|A)P(A) / P(B)**  
+
+![Bayes Formula](images/bayes_theorem_1.png)
+
+## Bayes Formula Example 1
+
+![Bayes Example 1a](images/bayes_theorem_2.png)
+![Bayes Example 1b](images/bayes_theorem_3.png)
+
+## Bayes Formula Example 2
+
+![Bayes Example 2](images/bayes_theorem_4.png)
+
+## Class Implementing Bayesian Updating    
+```python
+import matplotlib.pyplot as plt
+
+class Bayes(object):
+    def __init__(self, prior, likelihood_func):
+        '''
+        INPUT:
+        prior (dict): key is the value (e.g. 4-sided die),
+                      value is the probability
+        likelihood_func (function): takes a new piece of data and the value and
+                                    outputs the likelihood of getting that data
+        '''
+        self.prior = prior
+        self.likelihood_func = likelihood_func
+    def normalize(self):
+        '''
+        INPUT: None
+        OUTPUT: None
+        Makes the sum of the probabilities equal 1.
+        '''
+        total = float(sum(self.prior.values()))
+        for key in self.prior:
+            self.prior[key] /= total
+
+    def update(self, data):
+        '''
+        INPUT:
+            data (int or str): A single observation (data point)
+        OUTPUT: None
+        
+        Conduct a bayesian update. Multiply the prior by the likelihood and
+        make this the new prior.
+        '''
+        for key in self.prior:
+            self.prior[key] *= self.likelihood_func(data, key)
+        self.normalize()
+
+    def print_distribution(self):
+        '''
+        Print the current posterior probability.
+        '''
+        sorted_keys = sorted(self.prior.keys())
+        for key in sorted_keys:
+            print("{}: {}".format(key, self.prior[key]))
+
+    def plot(self, title=None, **kwargs):
+        '''
+        Plot the current prior.
+        '''
+        sorted_keys = sorted(self.prior.keys())
+        sorted_probs = [self.prior[key] for key in sorted_keys]
+        plt.plot(sorted_keys, sorted_probs, **kwargs)
+        plt.title(title)
+```
+
+**Example Likelihood Function**
+```python
+def coin_likelihood(data, p):
+    # what is the likelihood of drawing data
+    # given that the heads probability is p
+    # data = 0 for tails, 1 for heads
+    if data:
+        return p
+    return 1-p
+```
+    
