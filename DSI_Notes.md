@@ -1716,4 +1716,103 @@ def coin_likelihood(data, p):
         return p
     return 1-p
 ```
-    
+
+# Docker
+
+**TODO
+
+# AWS
+
+## Amazon Elastic Compute Cloud (Amazon EC2)
+Computing Power  
+Secure, resizable compute capacity in the cloud  
+[EC2](https://aws.amazon.com/ec2)
+
+## Amazon Simple Storage Service (Amazon S3)
+Storage  
+[S3](https://aws.amazon.com/s3/)
+
+# SQL, PostgreSQL, psycopg2
+
+**TODO
+
+# MongoDB, pymongo
+
+**TODO
+
+# Web Scraping, APIs
+
+**TODO
+
+# Spark, Spark SQL and Dataframes
+
+**TODO
+
+# Model Bias vs Variance
+
+**TODO: Need to expand this section
+
+![Bias-Variance Tradeoff](images/bias_variance_tradeoff.png)
+
+# Cross Validation
+
+## Leave One Out Cross Validation (LOOCV)
+
+## k-Fold Cross Validation
+
+1. Randomly shuffle the data, then divide the dataset into k different equally-sized subsets or "folds", usually 5 or 10.
+
+2. Set aside the first subset of data and train a model using the remaining k-1 subsets as training data.
+
+3. Calculate training error rate (with the k-1 subsets) and validation error rate from the subset that was set aside.
+
+4. Repeat steps 2 and 3 with each of the remaining subsets held out, so that each observation is used for validation exactly once.
+
+5. Combine the training and validation error estimates collected by repeating step 3, usually by taking their mean.
+
+# k-Nearest Neighbors (kNN)
+
+Strengths:
+* Conceptually simple
+* Easy to train
+* High accuracy
+* Insensitive to outliers
+* No assumptions about data
+
+Weaknesses:
+* As the number of dimensions(features) increases, the harder it becomes to effectively use kNN due to the increase in n(sample size/number of observations) that is required. 
+* Low Interpretability
+* Prediction time can become grows at same rate as the number of data points. Computationally expensive, requires a lot of memory.
+
+## Basic Outline of kNN Workflow
+
+```
+Calculate the distances from each data point to x
+Order the points by distance from lowest to highest
+The first k points are the "k nearest neighbors"
+Return a prediction:
+    If this is a classification problem (y is categorical):
+        return the most common label among the k nearest neighbors
+    If this is a regression problem (y is continuous):
+        return the mean of the y values of the k nearest neighbors
+```
+
+## Identifying the most relevant distance metric. 
+
+Choosing the correct distance metric is crucial to your results. Choices depend on the data you are working with and the question you are trying to answer.
+Common Distance metrics:
+* **Euclidean Distance, or L2 norm** - This is simply the straight line distance between 2 data points.
+* **Cosine Similarity** - A measure of the angle between the two vectors. Used when the relative direction of two vectors is more important than the relative magnitude. One area where it is particularly popular is in assessing text similarity.
+
+We need to categorize the star as a red or blue datapoint.  
+![kNN 1](images/kNN_1.png)
+
+Using Euclidean Distance  
+![kNN Eucidean Distance](images/kNN_2.png)
+
+Using Cosine Similarity  
+![kNN Cosine Similarity](images/kNN_3.png)
+
+## Determining the optimal value for k, the number of nearest neighbors.
+Use Cross Validation  
+**TODO: Need to add more about the bias-variance tradeoff for different values of k.
